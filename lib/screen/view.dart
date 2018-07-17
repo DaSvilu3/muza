@@ -20,9 +20,6 @@ class _ViewPageState extends State<ViewPage> {
 
   File file;
 
-  String name;
-  String user;
-  String file1;
 
   @override
   void initState() {
@@ -30,59 +27,79 @@ class _ViewPageState extends State<ViewPage> {
     super.initState();
 
     GetItemsFromDb.getItems().then((map){
-      print(map);
+
+      // firebase response will be like this
+      // [null, {file1: file1, name: yousuf, user: yousf}]
+
+      for (int i=0; i < map.length; i++) {
+        print(map[i]);
+      }
+
+      setState(() {
+        file = new File.fromMap(map[1]);
+      });
+
+
     });
   }
 
   @override
   Widget build(BuildContext context) {
 
-    return new Scaffold(
-        appBar: new AppBar(
+    Widget content;
 
+    // if the data still loading, a circular indicator will be running
+    // if the data arrived, then it will display it
+    if (file == null) {
+      content = new Center(
+        child: new CircularProgressIndicator(),
+      );
+    } else {
+      // I can put all the layout in a function and use it multiple times
+      content = _buildMainView();
+    }
+
+
+    /*
+      THERE are 3 parts in each layout
+      1- app bar (themes, titles, etc ...)
+      2- body (you can put any container here )
+      3- bottom navigation bar (for the tab bar, special buttons (edit, update)
+     */
+    return new Scaffold(
+      // in app bar you can modify the themes, the bar .. etc
+        appBar: new AppBar(
           title: new Text(widget.title),
         ),
-        body: new Center(
+        body: content// This trailing comma makes auto-formatting nicer for build methods.
+    );
+  }
 
-          child: new Column(
 
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              new Text(
-                'Name:',
-              ),
-              new TextField(
-                decoration: new InputDecoration(
-                    hintText: "write name",
-                    labelText: "Write full name"
-                ),
-                onChanged: (str){
-                  name = str;
-                },
-              ),
-              new Text("user",
-                style: Theme.of(context).textTheme.display1,
-              ),
-              new TextField(
-                decoration: new InputDecoration(
-                    hintText: "write user here",
-                    labelText: "Write username"
-                ),
-                onChanged: (str){
-                  user = str;
-                },
-              ),
-            ],
+  Center _buildMainView(){
+    return new Center(
+
+      child: new Column(
+
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          new Text(
+            'Name: ' + file.name,
           ),
-        )// This trailing comma makes auto-formatting nicer for build methods.
+          new Text("user :" + file.user,
+            style: Theme.of(context).textTheme.display1,
+          ),
+
+        ],
+      ),
     );
   }
 }
 
 
 class GetItemsFromDb {
-  static Future<Map> getItems( ) async {
-    Completer<Map> completer = new Completer<Map>();
+  static Future<List> getItems( ) async {
+    Completer<List> completer = new Completer<List>();
 
     FirebaseDatabase.instance
         .reference()
@@ -90,8 +107,8 @@ class GetItemsFromDb {
 
         .once()
         .then( (DataSnapshot snapshot) {
-
-      Map map = snapshot.value;
+      //print(snapshot.value);
+      List map = snapshot.value;
 //      for(var v in snapshot) {
 //
 //      }

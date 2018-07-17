@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'screen/add.dart';
+import 'screen/view.dart';
 
 void main() => runApp(new MyApp());
 
@@ -52,7 +53,15 @@ class _MyHomePageState extends State<MyHomePage> {
 
             new IconButton(icon: new Icon(Icons.add), onPressed: (){
               Navigator.push(context, new MaterialPageRoute(builder: (context)=> new AddPage(title: "add page",)));
-            })
+            }),
+
+            new Text(
+              'View file:',
+            ),
+
+            new IconButton(icon: new Icon(Icons.view_carousel), onPressed: (){
+              Navigator.push(context, new MaterialPageRoute(builder: (context)=> new ViewPage(title: "view page",)));
+            }),
 
           ],
         ),
